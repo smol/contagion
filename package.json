@@ -1,0 +1,13 @@
+{
+  "name": "virus",
+  "version": "0.1.0",
+  "dependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-clean": "^0.7.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-copy": "^0.8.2",
+    "grunt-contrib-sass": "~0.6.0",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-watch": "~0.5.3"
+  }
+}

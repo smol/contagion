@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /
+
+
+RewriteRule ^api/v1/(([a-z]*?)/([a-z]*?)/?)?$ /api/index.php?controller=$2&action=$3 [NC,L]
+RewriteRule ^((?!public|api/v1|api/).*)/$ /public/index.html [NC,L]
+RewriteRule ^((?!public|api/v1|api/).*)$ /public/$1 [NC,L]
