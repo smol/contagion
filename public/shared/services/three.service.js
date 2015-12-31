@@ -35,6 +35,7 @@
 				renderer = new THREE.WebGLRenderer({antialias : true});
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+				
 
 				THREEx.WindowResize(renderer, camera);
 				THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
