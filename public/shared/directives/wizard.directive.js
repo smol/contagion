@@ -7,10 +7,12 @@
 			transclude : true,
 			replace : true,
 			scope : {
-				display:'='
+				display:'=',
+				endCallback : '='
 			},
 			template : ''+
 				'<div class="wizard ng-hide-animate" data-ng-show="display">'+
+					'<a href="javascript:" data-ng-click="display=false;" class="close">Close</a>'+
 					'<div data-ng-transclude></div>' +
 					'<div class="controls">'+
 						'<a href="javascript:" class="prev link" data-ng-click="prev()">Précedent</a>'+
@@ -50,7 +52,8 @@
 					++current_index;
 
 					if (current_index == section.length){
-						element.hide();
+						scope.display = false;
+						scope.endCallback && scope.endCallback();
 						return;
 					}
 					index_changed(current_index);
