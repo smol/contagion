@@ -2,32 +2,69 @@ module.exports = function(grunt) {
 
 	// 1. All configuration goes here
 	grunt.initConfig({
-
-		pkg: grunt.file.readJSON('package.json'),
-
-		copy : {
-			main : {
-				expand : true,
-				cwd : 'public/static/javascripts/library/',
-				src : '*.js',
-				dest : 'public/build/library',
-				flatten : true
+		nodemon: {
+			dev: {
+				script: 'server.js'
 			}
 		},
 
+		pkg: grunt.file.readJSON('package.json'),
+
+		dirs : {
+			modules : 'front/bower_components',
+			src : 'front/public',
+			build : 'front/build'
+		},
+		copy : {
+			html : {
+				expand : true,
+				cwd : '<%= dirs.src %>',
+				src : '**/*.html',
+				dest : '<%= dirs.build %>',
+				flatten : false
+
+			},
+			asset : {
+				expand : true,
+				cwd : '<%= dirs.src %>/static/assets/',
+				src : '**/*',
+				dest : '<%= dirs.build %>/static/assets/',
+				flatten : false
+			},
+			font : {
+				expand : true,
+				cwd : '<%= dirs.src %>/static/font/',
+				src : '**/*',
+				dest : '<%= dirs.build %>/static/font/',
+				flatten : false
+			}
+			// main : {
+			// 	expand : true,
+			// 	cwd : '<%= dirs.src %>/static/javascripts/library/',
+			// 	src : '*.js',
+			// 	dest : 'public/build/library',
+			// 	flatten : true
+			// }
+		},
+
 		concat: {
-			dist: {
-				src: [
-					'public/static/javascripts/*.js',
-					'public/**/*.js', // All JS in the libs folder
-					'!public/build/**/*.js',
-					'!public/static/javascripts/library/*.min.js',
+			libs : {
+				src : [
+					'<%= dirs.modules %>/angular/angular.min.js',
+					'<%= dirs.modules %>/socket.io-client/socket.io.js',
+					'<%= dirs.modules %>/angular-socket-io/socket.min.js',
+					'<%= dirs.modules %>/three.js/build/three.min.js',
+					'<%= dirs.modules %>/angular-ui-router/release/angular-ui-router.min.js',
 				],
-				dest: 'public/build/virus.js',
+				dest: '<%= dirs.build %>/lib.min.js',
+			},
+			dist: {
+				src: ['<%= dirs.src %>/**/*.js'],
+				dest: '<%= dirs.build %>/contagion.min.js',
 			},
 			css : {
-				src : ['public/static/**/*.scss'],
-				dest : 'public/build/style.scss'
+				src : ['<%= dirs.src %>/static/**/*.scss'],
+				dest : '<%= dirs.build %>/style.scss'
 			}
 		},
 
@@ -44,7 +81,7 @@ module.exports = function(grunt) {
 					style: 'compressed'
 				},
 				files: {
-					'public/build/style.css': 'public/build/style.scss'
+					'<%= dirs.build %>/style.css': '<%= dirs.build %>/style.scss'
 				}
 			}
 		},
@@ -52,18 +89,18 @@ module.exports = function(grunt) {
 		autoprefixer: {
 			dist: {
 				files: {
-					'public/build/style.css': 'public/build/style.css'
+					'<%= dirs.build %>/style.css': '<%= dirs.build %>/style.css'
 				}
 			}
 		},
 
 		clean : {
-			src : ['public/build']
+			src : ['<%= dirs.build %>']
 		},
 
 		watch: {
 			scripts: {
-				files: ['public/**/*.js'],
+				files: ['<%= dirs.src %>/**/*.js'],
 				tasks: ['concat', 'uglify'],
 				options: {
 					spawn: false,
@@ -71,8 +108,17 @@ module.exports = function(grunt) {
 				},
 			},
 
+			html: {
+				files: ['<%= dirs.src %>/**/*.html'],
+				tasks: ['copy:html'],
+				options: {
+					spawn: false,
+					livereload: true,
+				}
+			},
+
 			css: {
-				files: ['public/static/**/*.scss'],
+				files: ['<%= dirs.src %>/static/**/*.scss'],
 				tasks: ['concat:css', 'sass'],
 				options: {
 					spawn: false,
@@ -80,6 +126,13 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+
+		concurrent : {
+			dev : ['watch', 'nodemon'],
+			options : {
+				logConcurrentOutput : true
+			}
+		}
 
 	});
 
@@ -90,12 +143,14 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-nodemon');
+	grunt.loadNpmTasks('grunt-concurrent');
 	// grunt.loadNpmTasks('grunt-autoprefixer');
 	// grunt.loadNpmTasks('grunt-devtools');
 
 	// 4. Where we tell Grunt what to do when we type "grunt" into the terminal.
-	grunt.registerTask('default', ['clean', 'copy:main', 'concat', 'uglify', 'sass']);
+	grunt.registerTask('default', ['clean', 'concat', 'uglify', 'sass', 'copy']);
 
-	grunt.registerTask('dev', ['default', 'watch']);
+	grunt.registerTask('dev', ['default', 'concurrent:dev']);
 
 };
